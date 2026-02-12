@@ -1,40 +1,35 @@
 name: Sync GitHub to Gitee
 on:
   push:
-    branches: [ main ] 
-    tags: ['*']
+    branches: [ main, master, dev ]  # 可根据你的实际分支调整
+    tags: ['*']                      # 同步所有标签（关联 Release）
   release:
-    types: [published, edited] 
-  workflow_dispatch: 
+    types: [published, edited]       # 发布/编辑 Release 都触发
+  workflow_dispatch:                 # 手动触发按钮，方便补同步
 
 jobs:
   sync-to-gitee:
     runs-on: ubuntu-latest
-    timeout-minutes: 10 
+    timeout-minutes: 10              # 设置超时时间，避免卡住
     steps:
       - name: Checkout full repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
+          fetch-depth: 0  # 拉取所有提交历史和标签，必须配置
 
       - name: Sync code to Gitee
         uses: wearerequired/git-mirror-action@master
         env:
+          # 用 GIT_TOKEN 做 HTTPS 认证（核心修复）
           GIT_TOKEN: ${{ secrets.GITEE_TOKEN }}
         with:
           source-repo: "https://github.com/${{ github.repository }}.git"
+          # HTTPS 认证格式：用户名:令牌@仓库地址
           destination-repo: "https://${{ secrets.GITEE_USERNAME }}:${{ secrets.GITEE_TOKEN }}@gitee.com/${{ secrets.GITEE_USERNAME }}/${{ github.event.repository.name }}.git"
-          mirror-args: "--mirror"
-
-      - name: Trigger Gitee CI workflow
-        uses: gitee-actions/trigger-workflow@v1
-        if: always() 
-        with:
-          gitee-token: ${{ secrets.GITEE_TOKEN }}
-          gitee-repo: ${{ secrets.GITEE_USERNAME }}/${{ github.event.repository.name }}
-          branch: ${{ github.ref_name }} 
 
       - name: Sync verification
         run: |
-          echo "同步完成！验证 Gitee 仓库地址：https://gitee.com/${{ secrets.GITEE_USERNAME }}/${{ github.event.repository.name }}"
-          echo "本次同步的分支/标签：${{ github.ref }}"
+          # 输出同步结果，方便排查
+          echo "✅ 同步完成！"
+          echo "🔗 Gitee 仓库地址：https://gitee.com/${{ secrets.GITEE_USERNAME }}/${{ github.event.repository.name }}"
+          echo "🔖 本次同步的分支/标签：${{ github.ref }}"
