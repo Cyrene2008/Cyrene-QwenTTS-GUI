@@ -8,7 +8,7 @@
 
 基于 PySide6 和 FluentUI 构建的 Qwen-TTS 现代化图形界面。
 
-[使用向导](Guide.md)
+[前往下载](https://github.com/Cyrene2008/Cyrene-QwenTTS-GUI/releases)|[使用向导](Guide.md)
 
 </div>
 
