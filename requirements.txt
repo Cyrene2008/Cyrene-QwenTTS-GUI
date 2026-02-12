@@ -1,0 +1,12 @@
+torch
+torchvision
+torchaudio
+qwen-tts
+PySide6-Fluent-Widgets
+psutil
+soundfile
+modelscope
+huggingface_hub
+fastapi
+uvicorn
+requests

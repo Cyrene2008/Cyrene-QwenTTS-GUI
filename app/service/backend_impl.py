@@ -1,0 +1,405 @@
+"""Qwen TTS 推理后端"""
+
+import os
+import time
+from typing import (
+    Literal,
+    Any,
+    TypeAlias,
+)
+from pathlib import Path
+
+import torch
+import soundfile as sf
+from modelscope import snapshot_download
+from qwen_tts import Qwen3TTSModel
+
+from app.core.config import (
+    LOGGER_LEVEL,
+    LOGGER_COLOR,
+    OUTPUT_PATH,
+)
+from app.core.logger import get_logger
+from app.core.memory_manager import (
+    cleanup_models,
+    get_free_memory,
+    OutOfMemoryError,
+)
+from app.core.hub import HubManager
+from app.core.utils import generate_filename
+
+logger = get_logger(
+    level=LOGGER_LEVEL,
+    color=LOGGER_COLOR,
+)
+
+AttnImpl: TypeAlias = Literal["eager", "sdpa", "flash_attention_2"]
+"""注意力加速方案"""
+
+
+class QwenTTSBackend:
+    """Qwen TTS 推理后端"""
+
+    def __init__(
+        self,
+    ) -> None:
+        """Qwen TTS 后端初始化"""
+        self.model_name = None
+        self.model = None
+        self.hub = HubManager(
+            hf_token=os.getenv("HF_TOKEN"),
+            ms_token=os.getenv("MODELSCOPE_API_TOKEN"),
+        )
+
+    def unload_model(
+        self,
+    ) -> None:
+        """卸载模型"""
+        logger.info("卸载 %s 模型", self.model_name)
+        try:
+            del self.model_name
+        except NameError:
+            pass
+        try:
+            del self.model
+        except NameError:
+            pass
+        cleanup_models()
+        self.model_name = None
+        self.model = None
+        logger.info("卸载模型完成")
+
+    def load_model(
+        self,
+        model_name: str | None = None,
+        device_map: str | None = "auto",
+        dtype: torch.dtype | None = torch.bfloat16,
+        attn_implementation: AttnImpl | None = None,
+        api_type: Literal["huggingface", "modelscope"] | None = "modelscope",
+    ) -> None:
+        """加载 Qwen TTS 模型
+
+        Args:
+            model_name (str | None):
+                加载的 Qwen TTS 模型名称
+            device_map (str | None):
+                加载模型使用的设备
+            dtype (torch.dtype | None):
+                加载模型使用的精度
+            attn_implementation (AttnImpl | None):
+                加载模型时使用的加速方案
+            api_type (Literal["huggingface", "modelscope"] | None):
+                下载 Qwen TTS 模型时使用的 API 类型
+
+        Raises:
+            ValueError:
+                当未设置任何模型名称时或者使用错误的 API 类型下载模型时
+            OutOfMemoryError:
+                内存不足以加载模型时
+        """
+        if self.model is not None and self.model_name == model_name:
+            logger.info("Qwen TTS 模型 %s 已加载", self.model_name)
+            return
+
+        if self.model_name is None and model_name is None:
+            raise ValueError("未指定 Qwen TTS 模型名称")
+
+        if self.model_name is not None and model_name is not None and self.model_name != model_name:
+            logger.info("切换 Qwen TTS 模型: %s -> %s", self.model_name, model_name)
+            self.unload_model()
+            self.model_name = model_name
+        else:
+            self.model_name = model_name
+            logger.info("加载 Qwen TTS 模型: %s", self.model_name)
+        
+        # Log CUDA status
+        if torch.cuda.is_available():
+            logger.info("CUDA 可用 (Available), 版本: %s, 设备: %s", torch.version.cuda, torch.cuda.get_device_name(0))
+        else:
+            logger.warning("CUDA 不可用 (Not Available)! 将使用 CPU 进行推理，速度可能会很慢。")
+
+        if api_type == "huggingface":
+            logger.info("从 HuggingFace 下载 %s 中", self.model_name)
+            model_path = self.hub.hf_api.snapshot_download(
+                repo_id=model_name,
+                repo_type="model",
+            )
+        elif api_type == "modelscope":
+            logger.info("从 ModelScope 下载 %s 中", self.model_name)
+            model_path = snapshot_download(
+                repo_id=model_name,
+                repo_type="model",
+            )
+        else:
+            raise ValueError(f"未知的 API 类型: {api_type}")
+
+        logger.info("%s 模型从 %s 下载完成", self.model_name, api_type)
+
+        try:
+            self.model = Qwen3TTSModel.from_pretrained(
+                pretrained_model_name_or_path=model_path,
+                device_map=device_map,
+                dtype=dtype,
+                attn_implementation=attn_implementation,
+            )
+        except OutOfMemoryError as e:
+            logger.error("加载 Qwen TTS 模型 %s 时发生内存不足: %s", self.model_name, e)
+            self.unload_model()
+            raise e
+
+        logger.info("%s 模型加载完成, 当前剩余的显存: %.2f MB", self.model_name, get_free_memory() / (1024 * 1024))
+        
+        # Log model device
+        if hasattr(self.model, "device"):
+            logger.info("模型加载位置: %s", self.model.device)
+        elif hasattr(self.model, "model") and hasattr(self.model.model, "device"):
+             logger.info("模型加载位置: %s", self.model.model.device)
+
+
+    def get_supported_speakers(
+        self,
+    ) -> list[str] | None:
+        """获取 Qwen TTS 支持的说话者列表
+
+        Returns:
+            (list[str] | None): 说话者列表, 如果模型不支持指定任何说话者时则返回 None
+        """
+        if self.model is None:
+            return None
+        return self.model.get_supported_speakers()
+
+    def get_supported_languages(
+        self,
+    ) -> list[str] | None:
+        """获取 Qwen TTS 支持的语言列表
+
+        Returns:
+            (list[str] | None): 语言列表, 如果模型不支持指定任何语言时则返回 None
+        """
+        if self.model is None:
+            return None
+        return self.model.get_supported_languages()
+
+    def get_device_info(self) -> dict:
+        """获取当前设备信息"""
+        info = {
+            "cuda_available": torch.cuda.is_available(),
+            "cuda_version": torch.version.cuda if torch.cuda.is_available() else None,
+            "device_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU",
+            "model_device": str(self.model.device) if self.model and hasattr(self.model, "device") else "Unknown"
+        }
+        return info
+
+    def generate_custom_voice(
+        self,
+        text: str,
+        speaker: str,
+        language: str | None = None,
+        instruct: str | None = None,
+        do_sample: bool | None = True,
+        top_k: int | None = 50,
+        top_p: float | None = 1.0,
+        temperature: float | None = 0.9,
+        repetition_penalty: float | None = 1.05,
+        subtalker_dosample: bool | None = True,
+        subtalker_top_k: int | None = 50,
+        subtalker_top_p: float | None = 1.0,
+        subtalker_temperature: float | None = 0.9,
+        max_new_tokens: int | None = 2048,
+    ) -> Path:
+        """使用提示词生成音频
+
+        Args:
+            text (str):
+                要合成的文本
+            speaker (str):
+                说话人的名字
+            language (str | None):
+                合成文本使用的语言, 可设置为 `auto` 自动根据要合成的文本语言进行配置
+            instruct (str | None):
+                描述合成的音频的特征
+            do_sample (bool | None):
+                是否使用采样, 建议设置为 `True` 以适用于大多数用例
+            top_k (int | None):
+                Top-k 采样参数
+            top_p (float | None):
+                Top-p 采样参数
+            temperature (float | None):
+                温度参数
+            repetition_penalty (float | None):
+                重复惩罚参数
+            subtalker_dosample (bool | None):
+                子说话人采样参数
+            subtalker_top_k (int | None):
+                子说话人 Top-k 采样参数
+            subtalker_top_p (float | None):
+                子说话人 Top-p 采样参数
+            subtalker_temperature (float | None):
+                子说话人温度参数
+            max_new_tokens (int | None):
+                生成的最大 Token 数量
+
+        Returns:
+            Path:
+                生成的音频文件路径
+        """
+        kwargs = {
+            "text": text,
+            "speaker": speaker,
+            "language": language,
+            "instruct": instruct,
+            "do_sample": do_sample,
+            "top_k": top_k,
+            "top_p": top_p,
+            "temperature": temperature,
+            "repetition_penalty": repetition_penalty,
+            "subtalker_dosample": subtalker_dosample,
+            "subtalker_top_k": subtalker_top_k,
+            "subtalker_top_p": subtalker_top_p,
+            "subtalker_temperature": subtalker_temperature,
+            "max_new_tokens": max_new_tokens,
+        }
+        logger.debug("调用 QwenTTSBackend.generate_custom_voice() 的参数: %s", kwargs)
+        
+        if self.model is None:
+            raise ValueError("模型未加载，请先加载模型 (Model not loaded)")
+
+        try:
+            logger.info("生成音频中")
+            start_time = time.perf_counter()
+            wavs, sr = self.model.generate_custom_voice(**kwargs)
+            logger.info("音频生成完成, 耗时: %.2fs", (time.perf_counter() - start_time))
+        except OutOfMemoryError as e:
+            logger.error("调用 Qwen TTS 模型 %s 进行音频合成时发生内存不足: %s", self.model_name, e)
+            self.unload_model()
+            raise e
+
+        return self.save_audio(wavs[0], sr)
+
+    def generate_voice_design(
+        self,
+        text: str,
+        instruct: str,
+        language: str | None = None,
+        do_sample: bool | None = True,
+        top_k: int | None = 50,
+        top_p: float | None = 1.0,
+        temperature: float | None = 0.9,
+        repetition_penalty: float | None = 1.05,
+        subtalker_dosample: bool | None = True,
+        subtalker_top_k: int | None = 50,
+        subtalker_top_p: float | None = 1.0,
+        subtalker_temperature: float | None = 0.9,
+        max_new_tokens: int | None = 2048,
+    ) -> Path:
+        """使用提示词生成音频, 并且使用提示词描述声音
+        """
+        kwargs = {
+            "text": text,
+            "instruct": instruct,
+            "language": language,
+            "do_sample": do_sample,
+            "top_k": top_k,
+            "top_p": top_p,
+            "temperature": temperature,
+            "repetition_penalty": repetition_penalty,
+            "subtalker_dosample": subtalker_dosample,
+            "subtalker_top_k": subtalker_top_k,
+            "subtalker_top_p": subtalker_top_p,
+            "subtalker_temperature": subtalker_temperature,
+            "max_new_tokens": max_new_tokens,
+        }
+        logger.debug("调用 QwenTTSBackend.generate_voice_design() 的参数: %s", kwargs)
+        
+        if self.model is None:
+            raise ValueError("模型未加载，请先加载模型 (Model not loaded)")
+
+        try:
+            logger.info("生成音频中")
+            start_time = time.perf_counter()
+            wavs, sr = self.model.generate_voice_design(**kwargs)
+            logger.info("音频生成完成, 耗时: %.2fs", (time.perf_counter() - start_time))
+        except OutOfMemoryError as e:
+            logger.error("调用 Qwen TTS 模型 %s 进行音频合成时发生内存不足: %s", self.model_name, e)
+            self.unload_model()
+            raise e
+
+        return self.save_audio(wavs[0], sr)
+
+    def generate_voice_clone(
+        self,
+        text: str,
+        language: str | None = None,
+        ref_audio: Path | None = None,
+        ref_text: str | None = None,
+        x_vector_only_mode: bool | None = False,
+        do_sample: bool | None = True,
+        top_k: int | None = 50,
+        top_p: float | None = 1.0,
+        temperature: float | None = 0.9,
+        repetition_penalty: float | None = 1.05,
+        subtalker_dosample: bool | None = True,
+        subtalker_top_k: int | None = 50,
+        subtalker_top_p: float | None = 1.0,
+        subtalker_temperature: float | None = 0.9,
+        max_new_tokens: int | None = 2048,
+    ) -> Path:
+        """使用提示词生成音频, 并利用一段音频克隆声音
+        """
+        kwargs = {
+            "text": text,
+            "language": language,
+            "ref_audio": str(ref_audio),
+            "ref_text": ref_text,
+            "x_vector_only_mode": x_vector_only_mode,
+            "do_sample": do_sample,
+            "top_k": top_k,
+            "top_p": top_p,
+            "temperature": temperature,
+            "repetition_penalty": repetition_penalty,
+            "subtalker_dosample": subtalker_dosample,
+            "subtalker_top_k": subtalker_top_k,
+            "subtalker_top_p": subtalker_top_p,
+            "subtalker_temperature": subtalker_temperature,
+            "max_new_tokens": max_new_tokens,
+        }
+        logger.debug("调用 QwenTTSBackend.generate_voice_clone() 的参数: %s", kwargs)
+        if not x_vector_only_mode and (ref_text is None or ref_text.strip() == ""):
+            raise ValueError("当 `x_vector_only_mode=False` 时, 需要提供参考音频对应的参考文本, 而当前的参考文本 `ref_text` 为空")
+
+        if self.model is None:
+            raise ValueError("模型未加载，请先加载模型 (Model not loaded)")
+
+        try:
+            logger.info("生成音频中")
+            start_time = time.perf_counter()
+            wavs, sr = self.model.generate_voice_clone(**kwargs)
+            logger.info("音频生成完成, 耗时: %.2fs", (time.perf_counter() - start_time))
+        except OutOfMemoryError as e:
+            logger.error("调用 Qwen TTS 模型 %s 进行音频合成时发生内存不足: %s", self.model_name, e)
+            self.unload_model()
+            raise e
+
+        return self.save_audio(wavs[0], sr)
+
+    def save_audio(
+        self,
+        wav: Any,
+        samplerate: int,
+    ) -> Path:
+        """将音频数据保存为音频文件
+
+        Args:
+            wav (Any):
+                音频数据
+            samplerate (int):
+                音频的采样率
+
+        Returns:
+            Path: 保存音频的路径
+        """
+        save_path = OUTPUT_PATH / f"{generate_filename()}.wav"
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        sf.write(save_path, wav, samplerate)
+        logger.info("音频文件保存到 '%s'", save_path)
+        return save_path
