@@ -8,7 +8,7 @@
 
 A modern GUI for Qwen-TTS, built with PySide6 and FluentUI.
 
-[Usage Guide](Guide.md)
+[Download](https://github.com/Cyrene2008/Cyrene-QwenTTS-GUI/releases)|[Usage Guide](Guide.md)
 
 </div>
 
