@@ -1,6 +1,6 @@
 <div align="center">
 
-<image src="app/resource/images/Cyrene.png" width="128" height="128" />
+<image src="app/resource/images/Cyrene.ico" width="128" height="128" />
 
 # Cyrene QwenTTS Cyrene GUI
 
@@ -28,7 +28,7 @@ The GUI provides two options for setting up the environment for Qwen-TTS models:
 
 ## Installation
 
-Download the latest version from [Releases](https://github.com/Cyrene2008/QwenTTS-GUI/releases).
+Download the latest version from [Releases](https://github.com/Cyrene2008/Cyrene-QwenTTS-GUI/releases).
 
 ### Build from Source
 
