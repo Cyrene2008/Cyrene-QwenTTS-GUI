@@ -5,6 +5,11 @@
 
 <img width="2340" height="1019" alt="ScreenShot_2026-02-12_182542_491" src="https://github.com/user-attachments/assets/1781513f-9281-422e-9e37-e23723108fe6" />
 
+### 🇨🇳国内用户点击这里高速下载（gh-proxy）
+ -[Qwen-TTS-Cyrene-GUIv0.1.0-withENV.z01](https://gh-proxy.org/https://github.com/Cyrene2008/Cyrene-QwenTTS-GUI/releases/download/v0.1.0/Qwen-TTS-Cyrene-GUIv0.1.0-withENV.z01)
+ -[Qwen-TTS-Cyrene-GUIv0.1.0-withENV.zip](https://gh-proxy.org/https://github.com/Cyrene2008/Cyrene-QwenTTS-GUI/releases/download/v0.1.0/Qwen-TTS-Cyrene-GUIv0.1.0-withENV.zip)
+ -[QwenTTS-Cyrene-GUI.exe](https://gh-proxy.org/https://github.com/Cyrene2008/Cyrene-QwenTTS-GUI/releases/download/v0.1.0/QwenTTS-Cyrene-GUI.exe)
+ 
 ## ✨ Key Features / 主要特性
 - 🎨 Modern Fluent Design / 现代化 Fluent 设计
   
