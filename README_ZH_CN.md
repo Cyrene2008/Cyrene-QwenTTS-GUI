@@ -8,6 +8,8 @@
 
 基于 PySide6 和 FluentUI 构建的 Qwen-TTS 现代化图形界面。
 
+[使用向导](Guide.md)
+
 </div>
 
 ## 功能特性
