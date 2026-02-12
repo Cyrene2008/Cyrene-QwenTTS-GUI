@@ -82,7 +82,7 @@ def build_onefile():
     cmd = [
         sys.executable, '-m', 'PyInstaller',
         '--clean',
-        '-n', 'QwenTTS-Cyren-GUI',
+        '-n', 'QwenTTS-Cyrene-GUI',
         '-F',
         '-w',
         '-i', 'app/resource/images/Cyrene.ico',
