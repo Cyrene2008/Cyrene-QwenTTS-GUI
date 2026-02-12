@@ -1,0 +1,40 @@
+name: Sync GitHub to Gitee
+on:
+  push:
+    branches: [ main ] 
+    tags: ['*']
+  release:
+    types: [published, edited] 
+  workflow_dispatch: 
+
+jobs:
+  sync-to-gitee:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10 
+    steps:
+      - name: Checkout full repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+
+      - name: Sync code to Gitee
+        uses: wearerequired/git-mirror-action@master
+        env:
+          GIT_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        with:
+          source-repo: "https://github.com/${{ github.repository }}.git"
+          destination-repo: "https://${{ secrets.GITEE_USERNAME }}:${{ secrets.GITEE_TOKEN }}@gitee.com/${{ secrets.GITEE_USERNAME }}/${{ github.event.repository.name }}.git"
+          mirror-args: "--mirror"
+
+      - name: Trigger Gitee CI workflow
+        uses: gitee-actions/trigger-workflow@v1
+        if: always() 
+        with:
+          gitee-token: ${{ secrets.GITEE_TOKEN }}
+          gitee-repo: ${{ secrets.GITEE_USERNAME }}/${{ github.event.repository.name }}
+          branch: ${{ github.ref_name }} 
+
+      - name: Sync verification
+        run: |
+          echo "同步完成！验证 Gitee 仓库地址：https://gitee.com/${{ secrets.GITEE_USERNAME }}/${{ github.event.repository.name }}"
+          echo "本次同步的分支/标签：${{ github.ref }}"
