@@ -1,4 +1,4 @@
-# QwenTTS-Cyrene-GUI v1.0.0 - Initial Release / 初次发布
+# QwenTTS-Cyrene-GUI v0.1.0 - Initial Release / 初次发布
 🎉 Welcome to the first release of QwenTTS-Cyrene-GUI! This is a modern, user-friendly GUI client for the powerful Qwen-TTS model, built with PySide6 and FluentUI. It allows you to run text-to-speech, voice cloning, and voice design tasks locally on your Windows machine with ease.
 
 🎉 欢迎使用 QwenTTS-Cyrene-GUI 的首个版本！ 这是一个基于 PySide6 和 FluentUI 构建的现代化 Qwen3-TTS 桌面客户端。它让您可以轻松地在 Windows 本地运行文本转语音、声音克隆和声音设计任务，拥有精美的界面和便捷的操作体验。
