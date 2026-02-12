@@ -51,6 +51,9 @@ We provide two download options based on your network conditions:
 - File : QwenTTS-Cyrene-GUI.exe
 - Description : Small size (~120MB). It will download the AI environment (PyTorch, etc.) automatically on the first run.
 - 描述 ：体积小（约 120MB）。首次运行时会自动下载 AI 运行环境（PyTorch 等）。
+
+<img width="2340" height="1019" alt="ScreenShot_2026-02-12_183221_615" src="https://github.com/user-attachments/assets/5a394ad2-c91a-4a44-84fc-4c31c76a1531" />
+
 ### Option 2: Full Package with Environment (Out-of-the-box) / 选项二：整合包（开箱即用推荐）
 - Files : Qwen-TTS-Cyrene-GUIv0.1.0-withENV.zip & Qwen-TTS-Cyrene-GUIv0.1.0-withENV.z01
 - Description : Large size. Includes the full AI environment.Download .zip and .z01 file, extract and run, no internet required for environment setup, what you should do is download model in QwenTTS-Cyrene-GUI.
