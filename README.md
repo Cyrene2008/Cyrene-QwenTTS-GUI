@@ -8,7 +8,7 @@
 
 A modern GUI for Qwen-TTS, built with PySide6 and FluentUI.
 
-[Using Guide](Guide.md)
+[Usage Guide](Guide.md)
 
 </div>
 
