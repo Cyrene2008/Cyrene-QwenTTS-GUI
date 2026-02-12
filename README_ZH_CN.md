@@ -2,7 +2,7 @@
 
 <image src="app/resource/images/Cyrene.ico" width="128" height="128" />
 
-# Cyrene QwenTTS Cyrene GUI
+# Cyrene QwenTTS GUI
 
 **语言选择** [ [English](README.md) | **简体中文** ]
 
