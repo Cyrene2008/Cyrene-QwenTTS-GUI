@@ -1,6 +1,6 @@
 <div align="center">
 
-<image src="app/resource/images/Cyrene.png" width="128" height="128" />
+<image src="app/resource/images/Cyrene.ico" width="128" height="128" />
 
 # Cyrene QwenTTS Cyrene GUI
 
@@ -28,7 +28,7 @@
 
 ## 安装指南
 
-请前往 [Releases](https://github.com/CyreneProject/QwenTTS-GUI/releases) 下载最新版本。
+请前往 [Releases](https://github.com/CyreneProject/Cyrene-QwenTTS-GUI/releases) 下载最新版本。
 
 ### 编译
 
