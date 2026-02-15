@@ -1,10 +1,10 @@
 <div align="center">
 
-<image src="app/resource/images/Cyrene.ico" width="128" height="128" />
+<image src="https://gh-proxy.org/https://raw.githubusercontent.com/Cyrene2008/Cyrene-QwenTTS-GUI/refs/heads/main/app/resource/images/Cyrene.ico" width="128" height="128" />
 
 # Cyrene QwenTTS GUI
 
-**语言选择** [ [English](README.md) | **简体中文** ]
+**语言选择** [ [English](README.md) | **✔简体中文** ]
 
 基于 PySide6 和 FluentUI 构建的 Qwen-TTS 现代化图形界面。
 
@@ -29,6 +29,7 @@
 ## 安装指南
 
 请前往 [Releases](https://github.com/CyreneProject/Cyrene-QwenTTS-GUI/releases) 下载最新版本。
+随后将 [requirements.txt](https://gh-proxy.org/https://raw.githubusercontent.com/Cyrene2008/Cyrene-QwenTTS-GUI/refs/heads/main/requirements.txt) 跟程序放到同一个目录内。
 
 ### 编译
 
