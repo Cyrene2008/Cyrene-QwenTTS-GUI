@@ -29,6 +29,7 @@ The GUI provides two options for setting up the environment for Qwen-TTS models:
 ## Installation
 
 Download the latest version from [Releases](https://github.com/Cyrene2008/Cyrene-QwenTTS-GUI/releases).
+Put [requirements.txt](https://gh-proxy.org/https://raw.githubusercontent.com/Cyrene2008/Cyrene-QwenTTS-GUI/refs/heads/main/requirements.txt) file in the same folder.
 
 ### Build from Source
 
