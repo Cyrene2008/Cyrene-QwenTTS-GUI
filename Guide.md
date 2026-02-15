@@ -70,8 +70,8 @@ We provide two download options based on your network conditions:
    - 将其放置在一个文件夹中（例如 D:\QwenTTS\ ）。如果是整合包，请先解压。
 3. Run QwenTTS-Cyrene-GUI.exe .
    - 运行 QwenTTS-Cyrene-GUI.exe 。
-   - Note for Standard Package: Follow the wizard to download dependencies.
-   - 标准版注意：请跟随向导下载依赖。
+   - Note for Standard Package: Remember to download [requirements.txt](https://gh-proxy.org/https://raw.githubusercontent.com/Cyrene2008/Cyrene-QwenTTS-GUI/refs/heads/main/requirements.txt). Follow the wizard to download dependencies.
+   - 标准版注意：记得下载 [requirements.txt](https://gh-proxy.org/https://raw.githubusercontent.com/Cyrene2008/Cyrene-QwenTTS-GUI/refs/heads/main/requirements.txt)!请跟随向导下载依赖。
 4. Important : After the app starts, you will see a splash video. Please CLICK anywhere on the screen to enter the main interface. (It is waiting for your interaction, not loading!)
    - 重要提示 ：程序启动会播放开场视频， 请点击屏幕任意位置以进入主界面 。（程序正在等待您的点击，并非卡在加载中！）
 ### ⚠️ Troubleshooting / 故障排除
