@@ -1,3 +1,6 @@
+                    GNU GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
 # 项目授权总览（Root LICENSE）
 
 ## 核心授权原则
@@ -27,4 +30,5 @@
 ## 完整 GPLv3 协议获取
 
 - 本地文件：[app/core/LICENSE](app/core/LICENSE)
-- 官方链接：[https://www.gnu.org/licenses/gpl-3.0.txt](https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- 官方链接：https://www.gnu.org/licenses/gpl-3.0.txt
