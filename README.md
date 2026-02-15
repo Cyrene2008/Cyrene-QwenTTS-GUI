@@ -55,17 +55,13 @@ Requirements: Python 3.10-3.12
 
 ## License
 
-This project is licensed under the **GPLv3 License** with extra permissions. See the [LICENSE](LICENSE) file for details.
+This project adopts a layered licensing architecture. Core rules are in the root [LICENSE](LICENSE) file:
 
-Built on the **QFluentWidgets** Python component library.
-- The source code is released under the GNU General Public License v3.0 (GPLv3) for non-commercial use.
-- Any derivative work must also be released under GPLv3.
+- Core code (app/core/, etc.): Follows GPLv3 open source license;
+- UI design scheme: All rights reserved (non-commercial use only with code display);
+- Third-party materials: Non-commercial fair use only, copyright belongs to original rights holders.
 
-**UI Design Copyright Notice**
-1. The user-interface design (layout, interaction logic, styling) is designed by **Cyrene2008 (StarCyrene)**.
-   - The copyright of this design is retained by the author and is **not** covered by the GPLv3 license.
-   - No individual or organization may copy, reproduce, adapt, or otherwise use the UI design without prior authorization.
-2. Third-party materials are used under fair-use principles for non-commercial contexts.
+Full GPLv3 license text: app/core/LICENSE
 
 ## Credits
 
