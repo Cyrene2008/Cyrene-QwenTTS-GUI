@@ -1,4 +1,4 @@
-                    GNU GENERAL PUBLIC LICENSE
+                       GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
  Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
@@ -673,12 +673,20 @@ the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <https://www.gnu.org/licenses/why-not-lgpl.html>.
 
-附加：
-本项目基于 QFluentWidgets Python 组件库开发，非商用场景下整体代码遵循 GNU General Public License v3.0 (GPLv3) 许可证发布。
-依据 QFluentWidgets 的授权规则，本项目源代码可被自由获取、修改、分发，且衍生作品也必须以 GPLv3 许可证发布。
+===========================================================================
+## 附加声明
+### 1. 核心代码授权范围
+本项目基于 QFluentWidgets Python 组件库开发，**非商用场景下的核心功能代码**（包括但不限于业务逻辑、算法实现、接口封装等）严格遵循 GNU General Public License v3.0 (GPLv3) 许可证发布：
+- 任何使用者可自由获取、修改、分发核心代码，衍生作品必须以 GPLv3 许可证发布；
+- 商用场景下使用核心代码需遵守 GPLv3 全量条款，且不得违反第三方组件（QFluentWidgets）的授权规则。
 
-【UI设计版权声明】
-1. 本项目的用户界面（UI）设计方案（包括但不限于：界面布局、功能模块排版、交互逻辑设计、界面组合样式）由Cyrene2008(StarCyrene)原创，保留该设计方案的著作权，不在 GPLv3 授权范围内。
-   任何个人或组织不得未经书面授权，复制、照搬、修改或使用上述UI设计方案。
-2. 本项目中使用的第三方素材（包括但不限于米哈游相关素材），其版权归原作者/原权利人所有，本项目仅在非商用场景下合理使用，不主张对该部分素材的任何版权。
-   任何使用者若需使用该类第三方素材，需自行获得原权利人的授权，本项目作者不承担相关责任。
+### 2. UI设计版权保护
+本项目的用户界面（UI）设计方案（包括但不限于：界面布局、功能模块排版、交互逻辑设计、界面组合样式）由 Cyrene2008(StarCyrene) 原创，**该部分设计方案不适用 GPLv3 授权**，保留全部著作权：
+- 未经作者书面授权，任何个人/组织不得复制、照搬、修改或商用上述UI设计方案；
+- 仅允许在非商用场景下，基于本项目核心代码调试时引用UI设计的展示效果，不得复用。
+
+### 3. 第三方素材使用声明
+本项目中使用的第三方素材（包括但不限于米哈游的相关素材），其版权归原权利人所有：
+- 该部分素材仅用于非商用场景下的展示，不主张任何版权，不纳入 GPLv3 授权范围；
+- 使用者若需商业使用该类素材，需自行获得原权利人的授权，作者不承担任何侵权责任；
+- 禁止将第三方素材用于商业用途、二次分发或修改后发布。
